@@ -48,10 +48,11 @@ def liste_des_produits():
     with connection.cursor(dictionary=True) as curseur:
         sql = "select * from produits"
         curseur.execute(sql)
-# [(1, 'pomme', 'alimentaire', 10, Decimal('350.00'), 1),]
 
+# [(1, 'pomme', 'alimentaire', 10, Decimal('350.00'), 1),]
 # 1: pomme - alimentaire - 10 - 350.00 - 1
 # lister[1]
+
         for lister in curseur.fetchall():
             # print(f"{lister[0]} : {lister[1]} - {lister[2]} - {lister[3]} - {lister[4]} - {lister[5]}")
             print(f"{lister["id"]} : {lister["designation"]} - {lister["categorie"]} - {lister["quantite"]} - {lister["prix_unitaire"]} - {lister["disponibilite"]}")
@@ -59,15 +60,24 @@ def liste_des_produits():
 
 def mise_a_jour():
     """Mettre a jour la quantite d'un produit"""
-
+    global trouve
     with connection.cursor() as curseur:
         liste_des_produits()
-
+        id = "select id from produits "
+        curseur.execute(id)
+        resultat = curseur.fetchall()
+        
         while True:
-            produit = input("ID produit : ")
-            if produit.isnumeric():
+            trouve = False
+            produit = int(input("ID produit : "))
+            for e in resultat:
+                if produit == e[0]:
+                    trouve = True
+            if trouve == True:
+                print ("ID valide")
                 break
-
+     
+            
         while True:
             qte = input("Nouvelle quantite : ")
             if qte.isnumeric():
@@ -137,13 +147,22 @@ def visualisation():
         choix = input("Choix : ")
 
         if choix == "1":
-            sql = ("""
-                select designation, prix_unitaire
-                from produits
-                order by prix_unitaire DESC
-            """)
+            sql = """
+                SELECT designation, prix_unitaire
+                FROM produits
+                ORDER BY prix_unitaire DESC
+                LIMIT 1
+            """
+
             curseur.execute(sql)
-            print(curseur.fetchone())
+            resultat = curseur.fetchone()
+
+            if resultat:
+                designation, prix = resultat
+                print(f"Produit le plus cher : {designation} — {prix}")
+            else:
+                print("Aucun produit trouvé")
+
 
         elif choix == "2":
             sql = ("""
