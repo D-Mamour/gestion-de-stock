@@ -30,7 +30,7 @@ CREATE TABLE `produits` (
   `prix_unitaire` decimal(10,2) NOT NULL,
   `disponibilite` tinyint(1) DEFAULT 1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,8 +39,35 @@ CREATE TABLE `produits` (
 
 LOCK TABLES `produits` WRITE;
 /*!40000 ALTER TABLE `produits` DISABLE KEYS */;
-INSERT INTO `produits` VALUES (1,'pomme','alimentaire',10,350.00,1),(3,'pomme','alimentaire',12,450.00,1),(4,'Hyundai','Automobile',25,5800000.00,1);
+INSERT INTO `produits` VALUES (1,'pomme','alimentaire',10,350.00,1),(4,'Hyundai','Automobile',25,5800000.00,1),(5,'banane','aliment',6,200.00,1);
 /*!40000 ALTER TABLE `produits` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `utilisateurs`
+--
+
+DROP TABLE IF EXISTS `utilisateurs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `utilisateurs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom_utilisateur` varchar(100) NOT NULL,
+  `mot_de_passe` varchar(255) NOT NULL,
+  `role` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nom_utilisateur` (`nom_utilisateur`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `utilisateurs`
+--
+
+LOCK TABLES `utilisateurs` WRITE;
+/*!40000 ALTER TABLE `utilisateurs` DISABLE KEYS */;
+INSERT INTO `utilisateurs` VALUES (1,'admin','$2b$12$PDrvDeMCEqDWE.UDY7NteuAEaPVfpFr.ev0sCHqgpXUXTFHwirWiS','admin');
+/*!40000 ALTER TABLE `utilisateurs` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -52,4 +79,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-02-11 12:56:22
+-- Dump completed on 2026-02-12 12:38:34
