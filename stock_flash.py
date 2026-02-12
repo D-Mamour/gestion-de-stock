@@ -1,4 +1,5 @@
 import mysql.connector
+import bcrypt
 
 connection = mysql.connector.connect(
     host = "localhost",
@@ -9,6 +10,17 @@ connection = mysql.connector.connect(
 
 if connection.is_connected():
     print("vous etes connecte dans la base de donnees challenge")
+
+mot_de_passe = bcrypt.hashpw("1234".encode(), bcrypt.gensalt())
+
+# with connection.cursor() as curseur:
+#     sql = """
+#     INSERT INTO utilisateurs (nom_utilisateur, mot_de_passe, role)
+#     VALUES (%s, %s, %s)
+#     """
+#     curseur.execute(sql, ("admin", mot_de_passe.decode(), "admin"))
+#     connection.commit()
+
 
 def ajouter_produit():
     """permet d'ajouter des produits"""
@@ -118,15 +130,25 @@ def recherche_produit():
 
 def supprimer_un_produit():
     """permet la suppression d'un produit"""
+    global trouve
 
     with connection.cursor() as curseur:
         liste_des_produits()
 
+        id = "select id from produits "
+        curseur.execute(id)
+        resultat = curseur.fetchall()
+
         while True:
-            produit_id = input("veuillez entrer le numero du produit a supprimer : ")
-            if produit_id.isnumeric():
+            trouve = False
+            produit_id = int(input("ID a supprimer : "))
+            for e in resultat :
+                # print(e)
+                if produit_id == e[0]:
+                    trouve = True
+            if trouve == True:
+                print("ID valide")
                 break
-            print("veuillez saisir un nombre")
         
         sql = "delete from produits where id = %s"
         curseur.execute(sql,(produit_id,))
@@ -185,8 +207,36 @@ def visualisation():
             for nombre_produits in curseur.fetchall():
                 print(nombre_produits)
 
+def connexion_utilisateur():
+    """Authentification utilisateur"""
 
-def menu():    
+    with connection.cursor(dictionary=True) as curseur:
+
+        nom = input("Nom utilisateur : ")
+        mot_de_passe = input("Mot de passe : ")
+
+        sql = "SELECT mot_de_passe, role FROM utilisateurs WHERE nom_utilisateur = %s"
+        curseur.execute(sql, (nom,))
+        resultat = curseur.fetchone()
+
+        if resultat:
+            mot_de_passe_stocke = resultat["mot_de_passe"].encode()
+
+            if bcrypt.checkpw(mot_de_passe.encode(), mot_de_passe_stocke):
+                print("Connexion reussie")
+                return resultat["role"]
+            
+            else:
+                print("Mot de passe incorrect")
+                return None
+            
+        else:
+            print("Utilisateur non trouve")
+            return None
+
+
+def menu(role):  
+
     while True:
         print("\n-------------------- MENU --------------------")
         
@@ -215,7 +265,10 @@ def menu():
             recherche_produit()
 
         elif choix == "5":
-            supprimer_un_produit()
+            if role == "admin":
+                supprimer_un_produit()
+            else:
+                print("Acces refuse : vous n'avez pas les droits")
 
         elif choix == "6":
             visualisation()
@@ -227,5 +280,11 @@ def menu():
         else:
             print("Choix invalide veuillez reessayer")   
 
-menu() 
+role_utilisateur = connexion_utilisateur()
+
+if role_utilisateur:
+    menu(role_utilisateur)
+else:
+    print("Acces refuse")
+
 connection.close()
